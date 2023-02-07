@@ -1,0 +1,175 @@
+C51 COMPILER V9.60.7.0   IRED                                                              02/08/2023 06:02:57 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE IRED
+OBJECT MODULE PLACED IN .\Objects\ired.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ired.c COMPACT OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\ired.lst) TABS(2) OBJECT(.\Objects\ired.obj)
+
+line level    source
+
+   1          #include "ired.h"
+   2          // 遥控16进制
+   3          // | 45 | 46 | 47 |    | C | S | O |
+   4          // | 44 | 40 | 43 |    | ( | ) | B |
+   5          // | 07 | 15 | 09 |    | + | - | x |
+   6          // | 16 | 19 | 0d |    | 0 | . | / |
+   7          // | 0c | 18 | 5e |    | 1 | 2 | 3 |
+   8          // | 08 | 1c | 5a |    | 4 | 5 | 6 |
+   9          // | 42 | 52 | 4a |    | 7 | 8 | 9 |
+  10          
+  11          typedef unsigned char u8;
+  12          typedef unsigned int u16;
+  13          u8 gired_data[4];
+  14          unsigned char last_gired_data = -1;
+  15          
+  16          void delay_10us_1(u16 ten_us)
+  17          {
+  18   1          while (ten_us--)
+  19   1              ;
+  20   1      }
+  21          
+  22          unsigned char convIred(unsigned char iredCode)
+  23          {
+  24   1          switch (iredCode)
+  25   1          {
+  26   2          case 0x42:
+  27   2              return 0;
+  28   2          case 0x52:
+  29   2              return 1;
+  30   2          case 0x4a:
+  31   2              return 2;
+  32   2          case 0x08:
+  33   2              return 3;
+  34   2          case 0x1C:
+  35   2              return 4;
+  36   2          case 0x5A:
+  37   2              return 5;
+  38   2      
+  39   2          case 0x0C:
+  40   2              return 6;
+  41   2          case 0x18:
+  42   2              return 7;
+  43   2          case 0x5E:
+  44   2              return 8;
+  45   2          case 0x16:
+  46   2              return 9;
+  47   2          case 0x19:
+  48   2              return 10;
+  49   2          case 0x0D:
+  50   2              return 11;
+  51   2      
+  52   2          case 0x07:
+  53   2              return 12;
+  54   2          case 0x15:
+C51 COMPILER V9.60.7.0   IRED                                                              02/08/2023 06:02:57 PAGE 2   
+
+  55   2              return 13;
+  56   2          case 0x09:
+  57   2              return 14;
+  58   2          case 0x44:
+  59   2              return 15;
+  60   2          case 0x40:
+  61   2              return 16;
+  62   2          case 0x43:
+  63   2              return 17;
+  64   2      
+  65   2          case 0x45:
+  66   2              return 18;
+  67   2          case 0x46:
+  68   2              return 19;
+  69   2          case 0x47:
+  70   2              return 20;
+  71   2          default:
+  72   2              return -1;
+  73   2          }
+  74   1      }
+  75          
+  76          void ired_init(void)
+  77          {
+  78   1          IT0 = 1;  // 下降沿触发
+  79   1          EX0 = 1;  // 打开中断0允许
+  80   1          EA = 1;   // 打开总中断
+  81   1          IRED = 1; // 初始化端口
+  82   1      }
+  83          
+  84          void parseIred()
+  85          {
+  86   1          u8 ired_high_time = 0;
+  87   1          u16 time_cnt = 0;
+  88   1          u8 i = 0, j = 0;
+  89   1      
+  90   1          if (IRED == 0)
+  91   1          {
+  92   2              time_cnt = 1000;
+  93   2              while ((!IRED) && (time_cnt)) // 等待引导信号9ms低电平结束，若超过10ms强制退出
+  94   2              {
+  95   3                  delay_10us_1(1); // 延时约10us
+  96   3                  time_cnt--;
+  97   3                  if (time_cnt == 0)
+  98   3                      return;
+  99   3              }
+ 100   2              if (IRED) // 引导信号9ms低电平已过，进入4.5ms高电平
+ 101   2              {
+ 102   3                  time_cnt = 500;
+ 103   3                  while (IRED && time_cnt) // 等待引导信号4.5ms高电平结束，若超过5ms强制退出
+ 104   3                  {
+ 105   4                      delay_10us_1(1);
+ 106   4                      time_cnt--;
+ 107   4                      if (time_cnt == 0)
+ 108   4                          return;
+ 109   4                  }
+ 110   3                  for (i = 0; i < 4; i++) // 循环4次，读取4个字节数据
+ 111   3                  {
+ 112   4                      for (j = 0; j < 8; j++) // 循环8次读取每位数据即一个字节
+ 113   4                      {
+ 114   5                          time_cnt = 600;
+ 115   5                          while ((IRED == 0) && time_cnt) // 等待数据1或0前面的0.56ms结束，若超过6
+             -ms强制退出
+C51 COMPILER V9.60.7.0   IRED                                                              02/08/2023 06:02:57 PAGE 3   
+
+ 116   5                          {
+ 117   6                              delay_10us_1(1);
+ 118   6                              time_cnt--;
+ 119   6                              if (time_cnt == 0)
+ 120   6                                  return;
+ 121   6                          }
+ 122   5                          time_cnt = 20;
+ 123   5                          while (IRED) // 等待数据1或0后面的高电平结束，若超过2ms强制退出
+ 124   5                          {
+ 125   6                              delay_10us_1(10); // 约0.1ms
+ 126   6                              ired_high_time++;
+ 127   6                              if (ired_high_time > 20)
+ 128   6                                  return;
+ 129   6                          }
+ 130   5                          gired_data[i] >>= 1;     // 先读取的为低位，然后是高位
+ 131   5                          if (ired_high_time >= 8) // 如果高电平时间大于0.8ms，数据则为1，否则�
+             -��0
+ 132   5                              gired_data[i] |= 0x80;
+ 133   5                          ired_high_time = 0; // 重新清零，等待下一次计算时间
+ 134   5                      }
+ 135   4                  }
+ 136   3              }
+ 137   2              if (gired_data[2] != ~gired_data[3]) // 校验控制码与反码，错误则返回
+ 138   2              {
+ 139   3                  for (i = 0; i < 4; i++)
+ 140   3                      gired_data[i] = 0;
+ 141   3                  return;
+ 142   3              }
+ 143   2              last_gired_data = gired_data[2];
+ 144   2          }
+ 145   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    405    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =      5       4
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

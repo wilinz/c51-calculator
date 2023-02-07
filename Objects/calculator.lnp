@@ -1,0 +1,7 @@
+".\Objects\main.obj",
+".\Objects\lcd1602.obj",
+".\Objects\matrix_key.obj",
+".\Objects\calculator.obj",
+".\Objects\ired.obj" 
+TO ".\Objects\calculator" 
+PRINT(".\Listings\calculator.m51") RAMSIZE(256) 

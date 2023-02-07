@@ -1,0 +1,146 @@
+C51 COMPILER V9.60.7.0   LCD1602                                                           02/08/2023 05:29:25 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LCD1602
+OBJECT MODULE PLACED IN .\Objects\lcd1602.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lcd1602.c COMPACT OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Li
+                    -stings\lcd1602.lst) TABS(2) OBJECT(.\Objects\lcd1602.obj)
+
+line level    source
+
+   1          #include "lcd1602.h"
+   2          
+   3          static void lcd1602_delay(uint16 p_time)
+   4          {
+   5   1          while(p_time--);
+   6   1      }
+   7          
+   8          static void lcd1602_write_cmd(uint8 p_cmd)
+   9          {
+  10   1          lcd1602_delay(100);
+  11   1          LCD1602_E=0;
+  12   1          lcd1602_delay(10);
+  13   1          LCD1602_RS=0;
+  14   1          lcd1602_delay(10);
+  15   1          LCD1602_RW=0;
+  16   1          lcd1602_delay(10);
+  17   1          LCD1602_PORT=p_cmd;
+  18   1          lcd1602_delay(10);
+  19   1          LCD1602_E=1;
+  20   1          lcd1602_delay(50);
+  21   1          LCD1602_E=0;
+  22   1      }
+  23          
+  24          static void lcd1602_write_data(uint8 p_data)
+  25          {
+  26   1          lcd1602_delay(100);
+  27   1          LCD1602_E=0;
+  28   1          lcd1602_delay(10);
+  29   1          LCD1602_RS=1;
+  30   1          lcd1602_delay(10);
+  31   1          LCD1602_RW=0;
+  32   1          lcd1602_delay(10);
+  33   1          LCD1602_PORT=p_data;
+  34   1          lcd1602_delay(10);
+  35   1          LCD1602_E=1;
+  36   1          lcd1602_delay(50);
+  37   1          LCD1602_E=0;
+  38   1      }
+  39          
+  40          void lcd1602_init()
+  41          {
+  42   1          uint8 t_cmd=0x38;
+  43   1          lcd1602_write_cmd(t_cmd);
+  44   1          t_cmd=0x06;
+  45   1          lcd1602_write_cmd(t_cmd);
+  46   1      }
+  47          
+  48          void lcd1602_display_switch(bool p_show_char,bool p_show_cursor,bool p_flash_cursor)
+  49          {
+  50   1          uint8 t_cmd=0x08;
+  51   1          if(p_show_char)
+  52   1          {
+  53   2              t_cmd|=0x04;
+  54   2          }
+C51 COMPILER V9.60.7.0   LCD1602                                                           02/08/2023 05:29:25 PAGE 2   
+
+  55   1          if(p_show_cursor)
+  56   1          {
+  57   2              t_cmd|=0x02;
+  58   2          }
+  59   1          if(p_flash_cursor)
+  60   1          {
+  61   2              t_cmd|=0x01;
+  62   2          }
+  63   1          lcd1602_write_cmd(t_cmd);
+  64   1      }
+  65          
+  66          void lcd1602_cursor_shift(bool p_right)
+  67          {
+  68   1          uint8 t_cmd;
+  69   1          if(p_right)
+  70   1          {
+  71   2              t_cmd=0x14;
+  72   2          }
+  73   1          else
+  74   1          {
+  75   2              t_cmd=0x10;
+  76   2          }
+  77   1          lcd1602_write_cmd(t_cmd);
+  78   1      }
+  79          
+  80          void lcd1602_clear()
+  81          {
+  82   1          uint8 t_cmd=0x01;
+  83   1          lcd1602_write_cmd(t_cmd);
+  84   1      }
+  85          
+  86          void lcd1602_cursor_return()
+  87          {
+  88   1          uint8 t_cmd=0x02;
+  89   1          lcd1602_write_cmd(t_cmd);
+  90   1      }
+  91          
+  92          void lcd1602_char_set(uint8 p_x,uint8 p_y,char p_char)
+  93          {
+  94   1          uint8 t_cmd=0x80;
+  95   1          p_x&=0x0f;
+  96   1          p_y&=0x01;
+  97   1          t_cmd|=p_x;
+  98   1          if(p_y)
+  99   1          {
+ 100   2              t_cmd|=0x40;
+ 101   2          }
+ 102   1          lcd1602_write_cmd(t_cmd);
+ 103   1          lcd1602_write_data(p_char);
+ 104   1      }
+ 105          
+ 106          void lcd1602_string_set(uint8 p_x,uint8 p_y,const char* p_string)
+ 107          {
+ 108   1          uint8 t_x,t_y;
+ 109   1          p_x&=0x0f;
+ 110   1          p_y&=0x01;
+ 111   1          for(t_y=p_y;t_y<2;t_y++)
+ 112   1          {
+ 113   2              for(t_x=p_x;t_x<16&&(*p_string)!=0;t_x++)
+ 114   2              {
+ 115   3                  lcd1602_char_set(t_x,t_y,*(p_string++));
+ 116   3              }
+C51 COMPILER V9.60.7.0   LCD1602                                                           02/08/2023 05:29:25 PAGE 3   
+
+ 117   2          }
+ 118   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    281    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----       6
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

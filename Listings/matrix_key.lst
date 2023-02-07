@@ -1,0 +1,187 @@
+C51 COMPILER V9.60.7.0   MATRIX_KEY                                                        02/08/2023 05:29:26 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MATRIX_KEY
+OBJECT MODULE PLACED IN .\Objects\matrix_key.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE matrix_key.c COMPACT OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.
+                    -\Listings\matrix_key.lst) TABS(2) OBJECT(.\Objects\matrix_key.obj)
+
+line level    source
+
+   1          #include "matrix_key.h"
+   2          /*******************************************************************************
+   3          * 函 数 名       : delay_10us
+   4          * 函数功能     : 延时函数，ten_us=1时，大约延时10us
+   5          * 输    入       : ten_us
+   6          * 输    出       : 无
+   7          *******************************************************************************/
+   8          void delay_10us(u16 ten_us)
+   9          {
+  10   1        while(ten_us--);  
+  11   1      }
+  12          
+  13          /*******************************************************************************
+  14          * 函 数 名       : key_matrix_ranks_scan
+  15          * 函数功能     : 使用行列式扫描方法，检测矩阵按键是否按下，按下则返回对应键
+             -值
+  16          * 输    入       : 无
+  17          * 输    出       : key_value：0-15，对应S1-S16键，
+  18                     -1：按键未按下
+  19          *******************************************************************************/
+  20          u8 key_matrix_ranks_scan(void)
+  21          {
+  22   1        u8 key_value=-1;
+  23   1      
+  24   1        KEY_MATRIX_PORT=0xf7;//给第一列赋值0，其余全为1
+  25   1        if(KEY_MATRIX_PORT!=0xf7)//判断第一列按键是否按下
+  26   1        {
+  27   2          delay_10us(1000);//消抖
+  28   2          switch(KEY_MATRIX_PORT)//保存第一列按键按下后的键值  
+  29   2          {
+  30   3            case 0x77: key_value=0;break;
+  31   3            case 0xb7: key_value=4;break;
+  32   3            case 0xd7: key_value=8;break;
+  33   3            case 0xe7: key_value=12;break;
+  34   3          }
+  35   2        }
+  36   1        while(KEY_MATRIX_PORT!=0xf7);//等待按键松开 
+  37   1        
+  38   1        KEY_MATRIX_PORT=0xfb;//给第二列赋值0，其余全为1
+  39   1        if(KEY_MATRIX_PORT!=0xfb)//判断第二列按键是否按下
+  40   1        {
+  41   2          delay_10us(1000);//消抖
+  42   2          switch(KEY_MATRIX_PORT)//保存第二列按键按下后的键值  
+  43   2          {
+  44   3            case 0x7b: key_value=1;break;
+  45   3            case 0xbb: key_value=5;break;
+  46   3            case 0xdb: key_value=9;break;
+  47   3            case 0xeb: key_value=13;break;
+  48   3          }
+  49   2        }
+  50   1        while(KEY_MATRIX_PORT!=0xfb);//等待按键松开 
+  51   1        
+  52   1        KEY_MATRIX_PORT=0xfd;//给第三列赋值0，其余全为1
+  53   1        if(KEY_MATRIX_PORT!=0xfd)//判断第三列按键是否按下
+C51 COMPILER V9.60.7.0   MATRIX_KEY                                                        02/08/2023 05:29:26 PAGE 2   
+
+  54   1        {
+  55   2          delay_10us(1000);//消抖
+  56   2          switch(KEY_MATRIX_PORT)//保存第三列按键按下后的键值  
+  57   2          {
+  58   3            case 0x7d: key_value=2;break;
+  59   3            case 0xbd: key_value=6;break;
+  60   3            case 0xdd: key_value=10;break;
+  61   3            case 0xed: key_value=14;break;
+  62   3          }
+  63   2        }
+  64   1        while(KEY_MATRIX_PORT!=0xfd);//等待按键松开 
+  65   1        
+  66   1        KEY_MATRIX_PORT=0xfe;//给第四列赋值0，其余全为1
+  67   1        if(KEY_MATRIX_PORT!=0xfe)//判断第四列按键是否按下
+  68   1        {
+  69   2          delay_10us(1000);//消抖
+  70   2          switch(KEY_MATRIX_PORT)//保存第四列按键按下后的键值  
+  71   2          {
+  72   3            case 0x7e: key_value=3;break;
+  73   3            case 0xbe: key_value=7;break;
+  74   3            case 0xde: key_value=11;break;
+  75   3            case 0xee: key_value=15;break;
+  76   3          }
+  77   2        }
+  78   1        while(KEY_MATRIX_PORT!=0xfe);//等待按键松开
+  79   1        
+  80   1        if (!P3_1)
+  81   1        {
+  82   2          delay_10us(1000);//消抖
+  83   2          while (!P3_1);
+  84   2          delay_10us(1000);//消抖
+  85   2          key_value=16;
+  86   2        }
+  87   1        
+  88   1        if (!P3_0)
+  89   1        {
+  90   2          delay_10us(1000);//消抖
+  91   2          while (!P3_0);
+  92   2          delay_10us(1000);//消抖
+  93   2          key_value=17;
+  94   2        }
+  95   1      
+  96   1        if (!P3_2)
+  97   1        {
+  98   2          delay_10us(1000);//消抖
+  99   2          while (!P3_2);
+ 100   2          delay_10us(1000);//消抖
+ 101   2          key_value=18;
+ 102   2        }
+ 103   1      
+ 104   1        if (!P3_3)
+ 105   1        {
+ 106   2          delay_10us(1000);//消抖
+ 107   2          while (!P3_3);
+ 108   2          delay_10us(1000);//消抖
+ 109   2          key_value=19;
+ 110   2        }
+ 111   1        return key_value;   
+ 112   1      }
+ 113          
+ 114          /*******************************************************************************
+ 115          * 函 数 名       : key_matrix_flip_scan
+C51 COMPILER V9.60.7.0   MATRIX_KEY                                                        02/08/2023 05:29:26 PAGE 3   
+
+ 116          * 函数功能     : 使用线翻转扫描方法，检测矩阵按键是否按下，按下则返回对应键
+             -值
+ 117          * 输    入       : 无
+ 118          * 输    出       : key_value：1-16，对应S1-S16键，
+ 119                     0：按键未按下
+ 120          *******************************************************************************/
+ 121          u8 key_matrix_flip_scan(void)
+ 122          {
+ 123   1        static u8 key_value=0;
+ 124   1      
+ 125   1        KEY_MATRIX_PORT=0x0f;//给所有行赋值0，列全为1
+ 126   1        if(KEY_MATRIX_PORT!=0x0f)//判断按键是否按下
+ 127   1        {
+ 128   2          delay_10us(1000);//消抖
+ 129   2          if(KEY_MATRIX_PORT!=0x0f)
+ 130   2          {
+ 131   3            //测试列
+ 132   3            KEY_MATRIX_PORT=0x0f;
+ 133   3            switch(KEY_MATRIX_PORT)//保存行为0，按键按下后的列值 
+ 134   3            {
+ 135   4              case 0x07: key_value=0;break;
+ 136   4              case 0x0b: key_value=1;break;
+ 137   4              case 0x0d: key_value=2;break;
+ 138   4              case 0x0e: key_value=3;break;
+ 139   4            }
+ 140   3            //测试行
+ 141   3            KEY_MATRIX_PORT=0xf0;
+ 142   3            switch(KEY_MATRIX_PORT)//保存列为0，按键按下后的键值 
+ 143   3            {
+ 144   4              case 0x70: key_value=key_value;break;
+ 145   4              case 0xb0: key_value=key_value+4;break;
+ 146   4              case 0xd0: key_value=key_value+8;break;
+ 147   4              case 0xe0: key_value=key_value+12;break;
+ 148   4            }
+ 149   3            while(KEY_MATRIX_PORT!=0xf0);//等待按键松开 
+ 150   3          }
+ 151   2        }
+ 152   1        else
+ 153   1          key_value=0;    
+ 154   1        
+ 155   1        return key_value;   
+ 156   1      }
+*** WARNING C316 IN LINE 156 OF matrix_key.c: unterminated conditionals
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    471    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =      1       1
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

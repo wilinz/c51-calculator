@@ -1,0 +1,54 @@
+C51 COMPILER V9.60.7.0   PUBLIC                                                            02/08/2023 05:17:15 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE PUBLIC
+OBJECT MODULE PLACED IN .\Objects\public.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE public.c COMPACT OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Lis
+                    -tings\public.lst) TABS(2) OBJECT(.\Objects\public.obj)
+
+line level    source
+
+   1          #include "public.h"
+   2          
+   3          typedef unsigned char u8;
+   4          typedef unsigned int u16;
+   5          
+   6          /*******************************************************************************
+   7           * 函 数 名       : delay_10us
+   8           * 函数功能    : 延时函数，ten_us=1时，大约延时10us
+   9           * 输    入       : ten_us
+  10           * 输    出      : 无
+  11           *******************************************************************************/
+  12          void delay_10us(u16 ten_us)
+  13          {
+  14   1        while (ten_us--)
+  15   1          ;
+  16   1      }
+  17          
+  18          /*******************************************************************************
+  19           * 函 数 名       : delay_ms
+  20           * 函数功能    : ms延时函数，ms=1时，大约延时1ms
+  21           * 输    入       : ms：ms延时时间
+  22           * 输    出      : 无
+  23           *******************************************************************************/
+  24          void delay_ms(u16 ms)
+  25          {
+  26   1        u16 i, j;
+  27   1        for (i = ms; i > 0; i--)
+  28   1          for (j = 110; j > 0; j--)
+  29   1            ;
+  30   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     41    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
