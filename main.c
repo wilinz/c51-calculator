@@ -207,6 +207,7 @@ void hander(char option)
         sprintf(result, "%.10g", a);
         resultLen = strlen(result);
 
+        lcd1602_string_set(0, 1, "                ");
         lcd1602_string_set(16 - resultLen, 1, result);
         toCursor(cursor + 2);
         return;
